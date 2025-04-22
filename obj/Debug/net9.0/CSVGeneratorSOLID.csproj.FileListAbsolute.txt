@@ -1,0 +1,14 @@
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\bin\Debug\net9.0\CSVGeneratorSOLID.exe
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\bin\Debug\net9.0\CSVGeneratorSOLID.deps.json
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\bin\Debug\net9.0\CSVGeneratorSOLID.runtimeconfig.json
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\bin\Debug\net9.0\CSVGeneratorSOLID.dll
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\bin\Debug\net9.0\CSVGeneratorSOLID.pdb
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\obj\Debug\net9.0\CSVGeneratorSOLID.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\obj\Debug\net9.0\CSVGeneratorSOLID.AssemblyInfoInputs.cache
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\obj\Debug\net9.0\CSVGeneratorSOLID.AssemblyInfo.cs
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\obj\Debug\net9.0\CSVGeneratorSOLID.csproj.CoreCompileInputs.cache
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\obj\Debug\net9.0\CSVGeneratorSOLID.dll
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\obj\Debug\net9.0\refint\CSVGeneratorSOLID.dll
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\obj\Debug\net9.0\CSVGeneratorSOLID.pdb
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\obj\Debug\net9.0\CSVGeneratorSOLID.genruntimeconfig.cache
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\obj\Debug\net9.0\ref\CSVGeneratorSOLID.dll
