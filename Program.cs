@@ -1,39 +1,44 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
 
 namespace CSVGeneratorSOLID
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            Console.WriteLine("=== Generador de CSV (SOLID) ===");
+            Console.WriteLine("=== Generador Múltiple de CSV (SOLID) ===");
 
-            // 1. Instanciamos los servicios
-            var columnDefinitionService = new ColumnDefinitionService();
-            var dataGenerationService = new DataGenerationService();
-            var csvWriter = new CSVWriter();
+            var registro       = new RegistroTablas();
+            var tableDefSvc    = new TableDefinitionService();
+            var dataGenSvc     = new DataGenerationService();
+            var writer         = new CSVWriter();
 
-            // 2. Obtenemos la definición de columnas y la cantidad de registros
-            List<ColumnDefinition> columnDefinitions = columnDefinitionService.GetColumnDefinitionsFromUser();
-            int recordCount = columnDefinitionService.GetRecordCountFromUser();
+            Console.Write("¿Cuántas tablas quieres crear? ");
+            int totalTablas = int.Parse(Console.ReadLine() ?? "0");
 
-            // 3. Generamos los datos
-            List<string[]> rows = dataGenerationService.GenerateData(columnDefinitions, recordCount);
-
-            // 4. Preguntamos por la ruta de archivo
-            Console.Write("\nIngresa el nombre (o ruta) del archivo CSV de salida: ");
-            string filePath = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(filePath))
+            for (int t = 0; t < totalTablas; t++)
             {
-                filePath = "output.csv";
+                Console.WriteLine($"\n================ TABLA {t + 1} de {totalTablas} ================");
+                var (nombre, columnas, filas) = tableDefSvc.GetTableDefinition(registro.GetAll());
+
+                // Generamos datos
+                var rows = dataGenSvc.GenerateData(columnas, filas, registro);
+
+                // Nombre completo de archivo
+                string filePath = $"{nombre}.csv";
+                writer.WriteToCSV(filePath, columnas, rows);
+
+                // Registramos para uso futuro
+                registro.Add(new TableMetadata
+                {
+                    TableName = nombre,
+                    Columns   = columnas,
+                    Rows      = rows
+                });
             }
 
-            // 5. Escribimos el CSV
-            csvWriter.WriteToCSV(filePath, columnDefinitions, rows);
-
-            Console.WriteLine("\nProceso finalizado. Presiona ENTER para salir...");
+            Console.WriteLine("\nProceso finalizado. Pulsa ENTER para cerrar.");
             Console.ReadLine();
         }
     }

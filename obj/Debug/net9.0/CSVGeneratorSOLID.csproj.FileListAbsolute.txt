@@ -12,3 +12,4 @@ C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\obj\Debug\net9
 C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\obj\Debug\net9.0\CSVGeneratorSOLID.pdb
 C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\obj\Debug\net9.0\CSVGeneratorSOLID.genruntimeconfig.cache
 C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\obj\Debug\net9.0\ref\CSVGeneratorSOLID.dll
+C:\Users\Universidad\Desktop\Trabajo\Proyecto 2\CSVGeneratorSOLID\obj\Debug\net9.0\CSVGeneratorSOLID.sourcelink.json

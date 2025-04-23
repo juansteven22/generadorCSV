@@ -1,65 +1,65 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CSVGeneratorSOLID
 {
     public class DataGenerationService
     {
-        /// <summary>
-        /// Devuelve un listado de filas (cada fila es un array de string) con los datos generados.
-        /// </summary>
-        /// <param name="columnDefinitions">Las definiciones de cada columna.</param>
-        /// <param name="recordCount">Cantidad de registros a generar.</param>
-        /// <returns>Lista de filas, donde cada fila es un array de string.</returns>
-        public List<string[]> GenerateData(List<ColumnDefinition> columnDefinitions, int recordCount)
+        public List<string[]> GenerateData(
+            List<ColumnDefinition> colDefs,
+            int recordCount,
+            RegistroTablas registro)
         {
-            // 1. Crear generadores para cada columna.
-            List<IDataGenerator> generators = new List<IDataGenerator>();
+            // Generadores para las columnas que NO reciclan
+            var generators = colDefs.Select(cd => cd.BaseTableName == null
+                                                  ? CreateDataGenerator(cd)
+                                                  : null).ToList();
 
-            foreach (var colDef in columnDefinitions)
+            // Traemos datos base por columna (cuando aplica)
+            var bases = colDefs.Select(cd =>
             {
-                generators.Add(CreateDataGenerator(colDef));
-            }
+                if (cd.BaseTableName == null) return null;
+                var tabla = registro.Find(cd.BaseTableName);
+                if (tabla == null) return null;
+                int idx = tabla.Columns.FindIndex(c => c.Name == cd.BaseColumnName);
+                return idx >= 0 ? tabla.Rows.Select(r => r[idx]).ToList() : null;
+            }).ToList();
 
-            // 2. Generar filas
-            var rows = new List<string[]>();
+            var rows = new List<string[]>(recordCount);
 
             for (int i = 0; i < recordCount; i++)
             {
-                string[] row = new string[columnDefinitions.Count];
-                for (int j = 0; j < columnDefinitions.Count; j++)
+                var row = new string[colDefs.Count];
+
+                for (int c = 0; c < colDefs.Count; c++)
                 {
-                    // Generamos valor usando el generador correspondiente
-                    row[j] = generators[j].GenerateValue(
-                        columnDefinitions[j].AllowRepetition,
-                        i
-                    );
+                    if (bases[c] != null && i < bases[c]!.Count)
+                    {
+                        // Copiamos del CSV base
+                        row[c] = bases[c]![i];
+                    }
+                    else
+                    {
+                        // Generamos nuevo valor
+                        row[c] = generators[c]!.GenerateValue(colDefs[c].AllowRepetition, i);
+                    }
                 }
+
                 rows.Add(row);
             }
 
             return rows;
         }
 
-        private IDataGenerator CreateDataGenerator(ColumnDefinition colDef)
+        private IDataGenerator CreateDataGenerator(ColumnDefinition def) => def.DataType switch
         {
-            switch (colDef.DataType)
-            {
-                case "int":
-                    return new IntegerDataGenerator();
-                case "string":
-                    // Podríamos personalizar la cadena base con el nombre de la columna
-                    return new StringDataGenerator(colDef.Name);
-                case "datetime":
-                    return new DateTimeDataGenerator();
-                case "bool":
-                    return new BoolDataGenerator();
-                case "decimal":
-                    return new DecimalDataGenerator();
-                default:
-                    // Por defecto, usamos string
-                    return new StringDataGenerator(colDef.Name);
-            }
-        }
+            "int"      => new IntegerDataGenerator(),
+            "string"   => new StringDataGenerator(def.Name),
+            "datetime" => new DateTimeDataGenerator(),
+            "bool"     => new BoolDataGenerator(),
+            "decimal"  => new DecimalDataGenerator(),
+            _          => new StringDataGenerator(def.Name)
+        };
     }
 }
