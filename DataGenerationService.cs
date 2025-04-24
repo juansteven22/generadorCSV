@@ -6,75 +6,86 @@ namespace CSVGeneratorSOLID
 {
     public class DataGenerationService
     {
-        /// <summary>
-        /// Genera todas las filas de la tabla.
-        /// Si una columna se basa en otra tabla y esa tabla se queda “corta”,
-        /// se generan valores nuevos que no repitan los existentes.
-        /// </summary>
         public List<string[]> GenerateData(
-            List<ColumnDefinition> colDefs,
-            int recordCount,
+            List<ColumnDefinition> defs,
+            int requestedRows,
             RegistroTablas registro)
         {
-            // 1) Generador por cada columna (SIEMPRE, aunque la columna recicle)
-            var generators = colDefs
-                .Select(CreateDataGenerator)
-                .ToList();
+            // ---------- 1) creamos SIEMPRE generador por columna ----------
+            var generators = defs.Select(CreateGenerator).ToList();
 
-            // 2) Lista de valores “heredados” por columna (puede ser null)
-            var baseLists = colDefs.Select(cd =>
+            // ---------- 2) listas base copiadas ----------
+            var bases = defs.Select(d =>
             {
-                if (cd.BaseTableName == null) return null;
-
-                var tabla = registro.Find(cd.BaseTableName);
-                if (tabla == null) return null;
-
-                int idx = tabla.Columns.FindIndex(c => c.Name == cd.BaseColumnName);
-                return idx >= 0 ? tabla.Rows.Select(r => r[idx]).ToList() : null;
+                if (d.BaseTableName == null) return null;
+                var t = registro.Find(d.BaseTableName);
+                if (t == null) return null;
+                int idx = t.Columns.FindIndex(c => c.Name == d.BaseColumnName);
+                return idx >= 0 ? t.Rows.Select(r => r[idx]).ToList() : null;
             }).ToList();
 
-            // 3) Conjunto de valores usados por columna (para evitar duplicados)
-            var usedSets = baseLists
-                .Select(bl => bl != null ? new HashSet<string>(bl) : new HashSet<string>())
-                .ToList();
+            // ---------- 3) calcular máximo de filas disponibles ----------
+            int maxRows = requestedRows;
 
-            var rows = new List<string[]>(recordCount);
-
-            for (int i = 0; i < recordCount; i++)
+            for (int c = 0; c < defs.Count; c++)
             {
-                string[] row = new string[colDefs.Count];
-
-                for (int c = 0; c < colDefs.Count; c++)
+                if (defs[c].AllowRepetition == false && defs[c].BaseTableName == null)
                 {
-                    // ¿Todavía hay datos en la lista base para esta fila?
-                    if (baseLists[c] != null && i < baseLists[c]!.Count)
+                    int available = defs[c].DataType switch
                     {
-                        row[c] = baseLists[c]![i];
-                        // Ya está en el HashSet, no hace falta añadir
+                        "int"      => ((IntegerDataGenerator)generators[c]).RangeSize(),
+                        "datetime" => ((DateTimeDataGenerator)generators[c]).RangeSizeDays(),
+                        _          => int.MaxValue            // string / decimal: asumimos “muchos”
+                    };
+                    maxRows = Math.Min(maxRows, available);
+                }
+
+                // si la columna recicla sin repetición, sólo podemos usar tantos
+                // como tenga la tabla base
+                if (defs[c].BaseTableName != null && defs[c].AllowRepetition == false)
+                {
+                    maxRows = Math.Min(maxRows, bases[c]!.Count);
+                }
+            }
+
+            if (maxRows < requestedRows)
+            {
+                Console.WriteLine(
+                    $"\n[Aviso] Dado el rango / unicidad de una o más columnas, " +
+                    $"solo se podrán generar {maxRows} registros (no {requestedRows}).");
+            }
+
+            // ---------- 4) conjuntos de valores usados para evitar duplicados ----------
+            var used = bases.Select(b => b != null ? new HashSet<string>(b) : new HashSet<string>())
+                            .ToList();
+
+            // ---------- 5) generación de filas ----------
+            var rows = new List<string[]>(maxRows);
+
+            for (int i = 0; i < maxRows; i++)
+            {
+                string[] row = new string[defs.Count];
+
+                for (int c = 0; c < defs.Count; c++)
+                {
+                    if (bases[c] != null && i < bases[c]!.Count)
+                    {
+                        row[c] = bases[c]![i];
                         continue;
                     }
 
-                    // Debemos generar un valor nuevo distinto de los ya usados
-                    string nuevo;
-                    int   intentos = 0;
+                    string val;
+                    int attempts = 0;
 
                     do
                     {
-                        // Para columnas que heredan, queremos que la secuencia
-                        // “continue” lógicamente: pasamos el índice global i
-                        // (así Id = 1001, 1002, … si la tabla base llegaba a 1000)
-                        nuevo = generators[c].GenerateValue(colDefs[c].AllowRepetition, i);
-                        intentos++;
+                        val = generators[c].GenerateValue(defs[c].AllowRepetition, i);
+                        attempts++;
                     }
-                    // Si allowRepetition == false ó la columna recicla,
-                    // NO aceptamos duplicados (salvo que superemos 20 intentos)
-                    while (usedSets[c].Contains(nuevo) && intentos < 20);
+                    while (!defs[c].AllowRepetition && used[c].Contains(val) && attempts < 20);
 
-                    // Después de 20 intentos puede ocurrir que sigamos chocando
-                    // (p. ej. tipo bool con sólo 2 posibilidades). En tal caso
-                    // aceptamos la repetición para evitar bucle infinito.
-                    row[c] = nuevo;
-                    usedSets[c].Add(nuevo);
+                    used[c].Add(val);
+                    row[c] = val;
                 }
 
                 rows.Add(row);
@@ -83,15 +94,15 @@ namespace CSVGeneratorSOLID
             return rows;
         }
 
-        // ----------  MÉTODO AUXILIAR  ----------
-        private IDataGenerator CreateDataGenerator(ColumnDefinition def) => def.DataType switch
+        // ------------------------ HELPER ------------------------
+        private IDataGenerator CreateGenerator(ColumnDefinition d) => d.DataType switch
         {
-            "int"      => new IntegerDataGenerator(),
-            "string"   => new StringDataGenerator(def.Name),
-            "datetime" => new DateTimeDataGenerator(),
+            "int"      => new IntegerDataGenerator(d.IntMin,  d.IntMax),
+            "decimal"  => new DecimalDataGenerator(d.DecMin,  d.DecMax),
+            "datetime" => new DateTimeDataGenerator(d.DateMin,d.DateMax),
             "bool"     => new BoolDataGenerator(),
-            "decimal"  => new DecimalDataGenerator(),
-            _          => new StringDataGenerator(def.Name)
+            "string"   => new StringDataGenerator(d.Name),
+            _          => new StringDataGenerator(d.Name)
         };
     }
 }

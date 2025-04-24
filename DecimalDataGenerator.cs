@@ -5,28 +5,29 @@ namespace CSVGeneratorSOLID
 {
     public class DecimalDataGenerator : IDataGenerator
     {
-        private Random _random;
+        private readonly Random _rnd = new();
+        private readonly decimal _min;
+        private readonly decimal _max;
 
-        public DecimalDataGenerator()
+        public DecimalDataGenerator(decimal? min = null, decimal? max = null)
         {
-            _random = new Random();
+            _min = min ?? 0m;
+            _max = max ?? 100_000m;
+            if (_max < _min) (_min, _max) = (_max, _min);
         }
 
-        public string GenerateValue(bool allowRepetition, int index)
+        public string GenerateValue(bool allowRep, int index)
         {
-            if (allowRepetition)
+            if (allowRep)
             {
-                // Generar un decimal aleatorio
-                // Tomamos un número aleatorio y lo dividimos para crear decimales
-                double randomValue = _random.NextDouble() * _random.Next(1, 100000);
-                return randomValue.ToString("F2", CultureInfo.InvariantCulture);
+                double d = _rnd.NextDouble();
+                decimal val = _min + (decimal)d * (_max - _min);
+                return Math.Round(val, 2).ToString(CultureInfo.InvariantCulture);
             }
-            else
-            {
-                // Generar un decimal secuencial: index + fracción .xx
-                // Ej: 1.00, 2.00, 3.00... con "F2" para formatear 2 decimales
-                return (index + 1).ToString("F2", CultureInfo.InvariantCulture);
-            }
+
+            // sin repetición → secuencia _min, _min+1, ...
+            decimal seq = _min + index;
+            return seq.ToString("F2", CultureInfo.InvariantCulture);
         }
     }
 }

@@ -4,29 +4,28 @@ namespace CSVGeneratorSOLID
 {
     public class DateTimeDataGenerator : IDataGenerator
     {
-        private Random _random;
-        private DateTime _startDate;
+        private readonly Random _rnd = new();
+        private readonly DateTime _min;
+        private readonly DateTime _max;
 
-        public DateTimeDataGenerator()
+        public DateTimeDataGenerator(DateTime? min = null, DateTime? max = null)
         {
-            _random = new Random();
-            // Definimos una fecha inicial arbitraria, p.ej. 1/1/2000
-            _startDate = new DateTime(2000, 1, 1);
+            _min = min ?? new DateTime(2000, 1, 1);
+            _max = max ?? new DateTime(2050, 12, 31);
+            if (_max < _min) (_min, _max) = (_max, _min);
         }
 
-        public string GenerateValue(bool allowRepetition, int index)
+        public string GenerateValue(bool allowRep, int index)
         {
-            if (allowRepetition)
+            if (allowRep)
             {
-                // Generar una fecha aleatoria entre 2000-01-01 y 2050-12-31 (por ejemplo)
-                int range = (new DateTime(2050, 12, 31) - _startDate).Days;
-                return _startDate.AddDays(_random.Next(range)).ToString("yyyy-MM-dd");
+                int days = (int)(_max - _min).TotalDays;
+                return _min.AddDays(_rnd.Next(days + 1)).ToString("yyyy-MM-dd");
             }
-            else
-            {
-                // Secuencia de fechas: iniciar en 2000-01-01 y avanzar un día por índice
-                return _startDate.AddDays(index).ToString("yyyy-MM-dd");
-            }
+
+            return _min.AddDays(index).ToString("yyyy-MM-dd");
         }
+
+        public int RangeSizeDays() => (int)(_max - _min).TotalDays + 1;
     }
 }

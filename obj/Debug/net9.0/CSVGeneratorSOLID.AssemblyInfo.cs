@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CSVGeneratorSOLID")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4a2b50ce97cbdea70cb79cbb2d3ad96a9a12b842")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b7ea67b180aa8032e983aab2bd61218312f3a42a")]
 [assembly: System.Reflection.AssemblyProductAttribute("CSVGeneratorSOLID")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CSVGeneratorSOLID")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

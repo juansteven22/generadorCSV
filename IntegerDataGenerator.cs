@@ -4,26 +4,27 @@ namespace CSVGeneratorSOLID
 {
     public class IntegerDataGenerator : IDataGenerator
     {
-        private Random _random;
+        private readonly Random _rnd = new();
+        private readonly int _min;
+        private readonly int _max;
 
-        public IntegerDataGenerator()
+        public IntegerDataGenerator(int? min = null, int? max = null)
         {
-            _random = new Random();
+            _min = min ?? 1;
+            _max = max ?? 100_000;
+            if (_max < _min) (_min, _max) = (_max, _min);
         }
 
-        public string GenerateValue(bool allowRepetition, int index)
+        public string GenerateValue(bool allowRep, int index)
         {
-            if (allowRepetition)
-            {
-                // Generar un entero aleatorio
-                return _random.Next(1, 100000).ToString();
-            }
-            else
-            {
-                // Secuencia sin repetición (1, 2, 3, ...)
-                // Usamos 'index + 1' para que inicie en 1
-                return (index + 1).ToString();
-            }
+            if (allowRep)
+                return _rnd.Next(_min, _max + 1).ToString();
+
+            // secuencia sin repetición
+            int val = _min + index;
+            return val.ToString();
         }
+
+        public int RangeSize() => _max - _min + 1;   // para cálculo de filas posibles
     }
 }
