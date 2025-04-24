@@ -20,14 +20,11 @@ namespace CSVGeneratorSOLID
         {
             if (allowRep)
             {
-                double d = _rnd.NextDouble();
-                decimal val = _min + (decimal)d * (_max - _min);
+                decimal val = _min + (decimal)_rnd.NextDouble() * (_max - _min);
                 return Math.Round(val, 2).ToString(CultureInfo.InvariantCulture);
             }
 
-            // sin repetición → secuencia _min, _min+1, ...
-            decimal seq = _min + index;
-            return seq.ToString("F2", CultureInfo.InvariantCulture);
+            return (_min + index).ToString("F2", CultureInfo.InvariantCulture);
         }
     }
 }

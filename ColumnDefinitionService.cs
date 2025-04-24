@@ -18,16 +18,17 @@ namespace CSVGeneratorSOLID
             {
                 Console.WriteLine($"\n— Columna #{i + 1} —");
 
-                // ------ nombre y tipo ------
+                // -------- nombre y tipo --------
                 Console.Write("Nombre: ");
-                string name  = Console.ReadLine() ?? $"Columna{i+1}";
-                Console.Write("Tipo (int, string, datetime, bool, decimal): ");
-                string type  = Console.ReadLine()?.Trim().ToLower() ?? "string";
+                string name = Console.ReadLine() ?? $"Columna{i + 1}";
 
-                // ------ reciclaje ------
-                string? baseTable  = null;
+                Console.Write("Tipo (int, string, datetime, bool, decimal): ");
+                string type = Console.ReadLine()?.Trim().ToLower() ?? "string";
+
+                // -------- reciclaje entre tablas --------
+                string? baseTable = null;
                 string? baseColumn = null;
-                bool    allowRep   = true; // sólo se pregunta si NO se recicla
+                bool allowRep = true; // sólo lo preguntamos si no se recicla
 
                 if (prev.Any())
                 {
@@ -41,42 +42,42 @@ namespace CSVGeneratorSOLID
                         if (int.TryParse(Console.ReadLine(), out int idxT) &&
                             idxT >= 1 && idxT <= prev.Count)
                         {
-                            var tabSel = prev[idxT - 1];
-                            var comp   = tabSel.Columns
-                                                .Where(c => c.DataType == type)
-                                                .ToList();
+                            var selected = prev[idxT - 1];
+                            var compatibles = selected.Columns
+                                                       .Where(c => c.DataType == type)
+                                                       .ToList();
 
-                            if (comp.Any())
+                            if (compatibles.Any())
                             {
-                                for (int c = 0; c < comp.Count; c++)
-                                    Console.WriteLine($"{c + 1}. {comp[c].Name}");
+                                for (int c = 0; c < compatibles.Count; c++)
+                                    Console.WriteLine($"{c + 1}. {compatibles[c].Name}");
 
                                 Console.Write("Elegir Nº columna: ");
                                 if (int.TryParse(Console.ReadLine(), out int idxC) &&
-                                    idxC >= 1 && idxC <= comp.Count)
+                                    idxC >= 1 && idxC <= compatibles.Count)
                                 {
-                                    baseTable  = tabSel.TableName;
-                                    baseColumn = comp[idxC - 1].Name;
+                                    baseTable = selected.TableName;
+                                    baseColumn = compatibles[idxC - 1].Name;
                                 }
                             }
                             else
                             {
-                                Console.WriteLine("‑ No existen columnas compatibles.");
+                                Console.WriteLine("- No existen columnas compatibles.");
                             }
                         }
                     }
                 }
 
-                // ------ repetición, sólo si NO se recicla ------
+                // -------- repetición (si no recicla) --------
                 if (baseTable == null)
                 {
                     Console.Write("¿Permitir repeticiones? (s/n): ");
                     allowRep = (Console.ReadLine()?.ToLower() == "s");
                 }
 
-                // ------ rangos opcionales ------
-                int?      iMin = null, iMax = null;
-                decimal?  dMin = null, dMax = null;
+                // -------- rangos opcionales --------
+                int? iMin = null, iMax = null;
+                decimal? dMin = null, dMax = null;
                 DateTime? dtMin = null, dtMax = null;
 
                 if (type is "int" or "decimal" or "datetime")
@@ -112,13 +113,50 @@ namespace CSVGeneratorSOLID
                     }
                 }
 
+                // -------- NUEVO · importación de strings --------
+                bool useImport = false;
+                string? importPath = null;
+                bool genExtra = false;
+                int? totalUnique = null;
+
+                if (type == "string")
+                {
+                    Console.Write("¿Importar valores desde un CSV externo? (s/n): ");
+                    useImport = (Console.ReadLine()?.ToLower() == "s");
+
+                    if (useImport)
+                    {
+                        Console.Write("Ruta del CSV (una columna, sin cabecera): ");
+                        importPath = Console.ReadLine();
+
+                        Console.WriteLine("  1. Usar sólo esos valores (se repetirán si faltan).");
+                        Console.WriteLine("  2. Crear valores únicos extra a partir de ellos.");
+                        Console.Write("Elige 1 ó 2: ");
+                        string modo = Console.ReadLine();
+                        if (modo == "2")
+                        {
+                            genExtra = true;
+                            Console.Write("¿Cuántos valores únicos en total deseas? ");
+                            totalUnique = int.Parse(Console.ReadLine() ?? "0");
+                        }
+                    }
+                }
+
+                // -------- almacenamos definición --------
                 defs.Add(new ColumnDefinition
                 {
-                    Name            = name,  DataType = type,  AllowRepetition = allowRep,
-                    BaseTableName   = baseTable,  BaseColumnName = baseColumn,
-                    IntMin = iMin, IntMax = iMax,
-                    DecMin = dMin, DecMax = dMax,
-                    DateMin = dtMin, DateMax = dtMax
+                    Name            = name,
+                    DataType        = type,
+                    AllowRepetition = allowRep,
+                    BaseTableName   = baseTable,
+                    BaseColumnName  = baseColumn,
+                    IntMin   = iMin, IntMax   = iMax,
+                    DecMin   = dMin, DecMax   = dMax,
+                    DateMin  = dtMin, DateMax = dtMax,
+                    UseImportedList     = useImport,
+                    ImportFilePath      = importPath,
+                    GenerateExtraUnique = genExtra,
+                    TotalUniqueDesired  = totalUnique
                 });
             }
 

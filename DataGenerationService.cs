@@ -11,10 +11,10 @@ namespace CSVGeneratorSOLID
             int requestedRows,
             RegistroTablas registro)
         {
-            // ---------- 1) creamos SIEMPRE generador por columna ----------
-            var generators = defs.Select(CreateGenerator).ToList();
+            // 1) Generador por columna
+            var gens = defs.Select(CreateGenerator).ToList();
 
-            // ---------- 2) listas base copiadas ----------
+            // 2) Datos base copiados (reciclaje)
             var bases = defs.Select(d =>
             {
                 if (d.BaseTableName == null) return null;
@@ -24,42 +24,43 @@ namespace CSVGeneratorSOLID
                 return idx >= 0 ? t.Rows.Select(r => r[idx]).ToList() : null;
             }).ToList();
 
-            // ---------- 3) calcular máximo de filas disponibles ----------
+            // 3) Máximo de filas posibles (unicidad, rangos, importaciones)
             int maxRows = requestedRows;
 
             for (int c = 0; c < defs.Count; c++)
             {
+                int available = int.MaxValue;
+
                 if (defs[c].AllowRepetition == false && defs[c].BaseTableName == null)
                 {
-                    int available = defs[c].DataType switch
+                    switch (defs[c].DataType)
                     {
-                        "int"      => ((IntegerDataGenerator)generators[c]).RangeSize(),
-                        "datetime" => ((DateTimeDataGenerator)generators[c]).RangeSizeDays(),
-                        _          => int.MaxValue            // string / decimal: asumimos “muchos”
-                    };
+                        case "int":
+                            available = ((IntegerDataGenerator)gens[c]).RangeSize();
+                            break;
+                        case "datetime":
+                            available = ((DateTimeDataGenerator)gens[c]).RangeSizeDays();
+                            break;
+                        case "string":
+                            if (gens[c] is ImportedStringGenerator imp)
+                                available = imp.UniqueCount();
+                            break;
+                    }
                     maxRows = Math.Min(maxRows, available);
                 }
 
-                // si la columna recicla sin repetición, sólo podemos usar tantos
-                // como tenga la tabla base
                 if (defs[c].BaseTableName != null && defs[c].AllowRepetition == false)
-                {
                     maxRows = Math.Min(maxRows, bases[c]!.Count);
-                }
             }
 
             if (maxRows < requestedRows)
-            {
-                Console.WriteLine(
-                    $"\n[Aviso] Dado el rango / unicidad de una o más columnas, " +
-                    $"solo se podrán generar {maxRows} registros (no {requestedRows}).");
-            }
+                Console.WriteLine($"\n[Aviso] Se generarán {maxRows} registros (no {requestedRows}).");
 
-            // ---------- 4) conjuntos de valores usados para evitar duplicados ----------
+            // 4) Conjuntos usados p/ evitar duplicados
             var used = bases.Select(b => b != null ? new HashSet<string>(b) : new HashSet<string>())
                             .ToList();
 
-            // ---------- 5) generación de filas ----------
+            // 5) Generación final
             var rows = new List<string[]>(maxRows);
 
             for (int i = 0; i < maxRows; i++)
@@ -75,14 +76,13 @@ namespace CSVGeneratorSOLID
                     }
 
                     string val;
-                    int attempts = 0;
-
+                    int tries = 0;
                     do
                     {
-                        val = generators[c].GenerateValue(defs[c].AllowRepetition, i);
-                        attempts++;
+                        val = gens[c].GenerateValue(defs[c].AllowRepetition, i);
+                        tries++;
                     }
-                    while (!defs[c].AllowRepetition && used[c].Contains(val) && attempts < 20);
+                    while (!defs[c].AllowRepetition && used[c].Contains(val) && tries < 20);
 
                     used[c].Add(val);
                     row[c] = val;
@@ -94,14 +94,16 @@ namespace CSVGeneratorSOLID
             return rows;
         }
 
-        // ------------------------ HELPER ------------------------
+        // ---------- helper ----------
         private IDataGenerator CreateGenerator(ColumnDefinition d) => d.DataType switch
         {
             "int"      => new IntegerDataGenerator(d.IntMin,  d.IntMax),
             "decimal"  => new DecimalDataGenerator(d.DecMin,  d.DecMax),
             "datetime" => new DateTimeDataGenerator(d.DateMin,d.DateMax),
             "bool"     => new BoolDataGenerator(),
-            "string"   => new StringDataGenerator(d.Name),
+            "string"   => d.UseImportedList
+                              ? new ImportedStringGenerator(d)
+                              : new StringDataGenerator(d.Name),
             _          => new StringDataGenerator(d.Name)
         };
     }

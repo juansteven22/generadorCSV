@@ -20,11 +20,9 @@ namespace CSVGeneratorSOLID
             if (allowRep)
                 return _rnd.Next(_min, _max + 1).ToString();
 
-            // secuencia sin repetición
-            int val = _min + index;
-            return val.ToString();
+            return (_min + index).ToString();   // sin repetición
         }
 
-        public int RangeSize() => _max - _min + 1;   // para cálculo de filas posibles
+        public int RangeSize() => _max - _min + 1;
     }
 }

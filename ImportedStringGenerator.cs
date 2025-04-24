@@ -5,49 +5,53 @@ using System.Linq;
 
 namespace CSVGeneratorSOLID
 {
+    /// <summary>
+    /// Genera valores string usando una lista importada desde un CSV.
+    /// - Si AllowRepetition = false → devuelve la lista en orden, sin repetir.
+    /// - Si AllowRepetition = true  → elige valores al azar (puede repetir).
+    /// Puede, opcionalmente, crear más valores únicos añadiendo sufijos.
+    /// </summary>
     public class ImportedStringGenerator : IDataGenerator
     {
-        private readonly List<string> _pool;      // valores únicos disponibles
-        private readonly Random       _rnd = new();
-        private readonly bool         _allowRep;
+        private readonly List<string> _pool;
+        private readonly Random _rnd = new();
+        private readonly bool _allowRep;
 
         public ImportedStringGenerator(ColumnDefinition def)
         {
             _allowRep = def.AllowRepetition;
 
-            // 1) leer CSV
-            var raw = File.ReadAllLines(def.ImportFilePath!)
-                          .Select(s => s.Trim())
-                          .Where(s => !string.IsNullOrEmpty(s))
-                          .Distinct()
-                          .ToList();
+            // 1) Leemos el CSV (una columna, sin cabecera)
+            var originales = File.ReadAllLines(def.ImportFilePath!)
+                                 .Select(s => s.Trim())
+                                 .Where(s => !string.IsNullOrEmpty(s))
+                                 .Distinct()
+                                 .ToList();
 
-            _pool = new List<string>(raw);
+            _pool = new List<string>(originales);
 
-            // 2) ¿crear valores extra?
-            if (def.GenerateExtraUnique && (def.TotalUniqueDesired ?? 0) > _pool.Count)
+            // 2) ¿Crear extras?
+            if (def.GenerateExtraUnique && def.TotalUniqueDesired.HasValue)
             {
-                int objetivo = def.TotalUniqueDesired!.Value;
+                int objetivo = def.TotalUniqueDesired.Value;
                 var hash = new HashSet<string>(_pool);
 
                 while (_pool.Count < objetivo)
                 {
-                    string baseWord = raw[_rnd.Next(raw.Count)];
-                    string candidate = $"{baseWord}{_rnd.Next(1, 1000000)}";
+                    string baseWord = originales[_rnd.Next(originales.Count)];
+                    string candidate = $"{baseWord}{_rnd.Next(1, 1_000_000)}";
                     if (hash.Add(candidate))
                         _pool.Add(candidate);
                 }
             }
         }
 
-        // ---- API ----
         public string GenerateValue(bool allowRep, int index)
         {
-            if (!_allowRep)        // secuencia única
+            if (!_allowRep)           // secuencia sin repetición
                 return _pool[index];
 
-            // repetición → aleatorio
-            return _pool[_rnd.Next(_pool.Count)];
+            return _pool[_rnd.Next(_pool.Count)];  // con repetición
         }
 
         public int UniqueCount() => _pool.Count;
