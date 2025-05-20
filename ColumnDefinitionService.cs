@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-
-namespace CSVGeneratorSOLID
+//Код спрашивает пользователя о колонках таблицы.
+namespace CSVGenerador
 {
     public class ColumnDefinitionService
     {
-        public List<ColumnDefinition> GetColumnDefinitionsFromUser(IReadOnlyList<TableMetadata> prev)
+        public List<ColumnDefinition> GetColumnasDelUsuario(IReadOnlyList<TableMetadata> prev)
         {
             var defs = new List<ColumnDefinition>();
 
@@ -44,20 +44,20 @@ namespace CSVGeneratorSOLID
                         {
                             var selected = prev[idxT - 1];
                             var compatibles = selected.Columns
-                                                       .Where(c => c.DataType == type)
+                                                       .Where(c => c.TipoDeDato == type)
                                                        .ToList();
 
                             if (compatibles.Any())
                             {
                                 for (int c = 0; c < compatibles.Count; c++)
-                                    Console.WriteLine($"{c + 1}. {compatibles[c].Name}");
+                                    Console.WriteLine($"{c + 1}. {compatibles[c].Nombre}");
 
                                 Console.Write("Elegir Nº columna: ");
                                 if (int.TryParse(Console.ReadLine(), out int idxC) &&
                                     idxC >= 1 && idxC <= compatibles.Count)
                                 {
                                     baseTable = selected.TableName;
-                                    baseColumn = compatibles[idxC - 1].Name;
+                                    baseColumn = compatibles[idxC - 1].Nombre;
                                 }
                             }
                             else
@@ -145,18 +145,18 @@ namespace CSVGeneratorSOLID
                 // -------- almacenamos definición --------
                 defs.Add(new ColumnDefinition
                 {
-                    Name            = name,
-                    DataType        = type,
-                    AllowRepetition = allowRep,
+                    Nombre            = name,
+                    TipoDeDato        = type,
+                    PermitirRepeticion = allowRep,
                     BaseTableName   = baseTable,
                     BaseColumnName  = baseColumn,
                     IntMin   = iMin, IntMax   = iMax,
                     DecMin   = dMin, DecMax   = dMax,
                     DateMin  = dtMin, DateMax = dtMax,
-                    UseImportedList     = useImport,
+                    UsarListaImportada     = useImport,
                     ImportFilePath      = importPath,
-                    GenerateExtraUnique = genExtra,
-                    TotalUniqueDesired  = totalUnique
+                    GenerarValoresAdicionalesUnicos = genExtra,
+                    TotalValoresUnicosDeseados  = totalUnique
                 });
             }
 

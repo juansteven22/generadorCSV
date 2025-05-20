@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace CSVGeneratorSOLID
+namespace CSVGenerador
 {
     public class CSVWriter
     {
@@ -15,7 +15,7 @@ namespace CSVGeneratorSOLID
             // 1. Escribimos la cabecera
             for (int i = 0; i < columnDefinitions.Count; i++)
             {
-                sb.Append(columnDefinitions[i].Name);
+                sb.Append(columnDefinitions[i].Nombre);
                 if (i < columnDefinitions.Count - 1)
                     sb.Append(",");
             }

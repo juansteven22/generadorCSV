@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CSVGeneratorSOLID
+namespace CSVGenerador
 {
     public class TableDefinitionService
     {
@@ -16,7 +16,7 @@ namespace CSVGeneratorSOLID
             if (string.IsNullOrWhiteSpace(tableName)) tableName = $"Tabla{DateTime.Now:yyyyMMddHHmmss}";
 
             // Columnas
-            var columns = _columnService.GetColumnDefinitionsFromUser(tablasPrevias);
+            var columns = _columnService.GetColumnasDelUsuario(tablasPrevias);
 
             // Filas
             Console.Write("¿Cuántas filas deseas generar? (máx 1000000): ");

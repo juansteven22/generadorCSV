@@ -1,6 +1,6 @@
 using System;
 
-namespace CSVGeneratorSOLID
+namespace CSVGenerador
 {
     public class IntegerDataGenerator : IDataGenerator
     {

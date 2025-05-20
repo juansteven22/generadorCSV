@@ -1,12 +1,14 @@
 using System;
 
-namespace CSVGeneratorSOLID
+//Код генерирует значения "true" или "false".
+
+namespace CSVGenerador
 {
-    public class BoolDataGenerator : IDataGenerator
+    public class BoolDataGenerador : IDataGenerator
     {
         private Random _random;
 
-        public BoolDataGenerator()
+        public BoolDataGenerador()
         {
             _random = new Random();
         }
@@ -20,7 +22,7 @@ namespace CSVGeneratorSOLID
             }
             else
             {
-                // Se podría generar alternando false, true, false, true...
+                // Se generando alternando false, true, false, true...
                 // O a partir de index % 2
                 return (index % 2 == 0) ? "false" : "true";
             }

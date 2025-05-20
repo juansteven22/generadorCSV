@@ -1,10 +1,12 @@
-namespace CSVGeneratorSOLID
+
+//Класс описывает одну колонку таблицы.
+namespace CSVGenerador
 {
     public class ColumnDefinition
     {
-        public string  Name            { get; set; }
-        public string  DataType        { get; set; }
-        public bool    AllowRepetition { get; set; }
+        public string  Nombre            { get; set; }
+        public string  TipoDeDato        { get; set; }
+        public bool    PermitirRepeticion { get; set; }
         public string? BaseTableName   { get; set; }
         public string? BaseColumnName  { get; set; }
 
@@ -17,9 +19,9 @@ namespace CSVGeneratorSOLID
         public DateTime? DateMax  { get; set; }
 
         // ------- NUEVO para importación de strings -------
-        public bool      UseImportedList      { get; set; }  // true si se importa
+        public bool      UsarListaImportada      { get; set; }  // true si se importa
         public string?   ImportFilePath       { get; set; }  // ruta del CSV
-        public bool      GenerateExtraUnique  { get; set; }  // opción B
-        public int?      TotalUniqueDesired   { get; set; }  // sólo si GenerateExtraUnique
+        public bool      GenerarValoresAdicionalesUnicos  { get; set; }  // opción B
+        public int?      TotalValoresUnicosDeseados   { get; set; }  // sólo si TotalValoresUnicosDeseados
     }
 }

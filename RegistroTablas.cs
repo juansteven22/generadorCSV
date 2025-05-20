@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CSVGeneratorSOLID
+namespace CSVGenerador
 {
     public class RegistroTablas
     {

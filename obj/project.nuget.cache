@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xZzi+vEXBro=",
+  "dgSpecHash": "BymW0vs4vO0=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Universidad\\Desktop\\Trabajo\\Proyecto 2\\CSVGeneratorSOLID\\CSVGeneratorSOLID.csproj",
+  "projectFilePath": "C:\\Users\\Universidad\\Desktop\\Trabajo\\Proyecto 2 IMPORTANTE\\CSVGeneratorSOLID\\CSVGenerador.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Universidad\\.nuget\\packages\\microsoft.data.sqlite\\9.0.4\\microsoft.data.sqlite.9.0.4.nupkg.sha512",
     "C:\\Users\\Universidad\\.nuget\\packages\\microsoft.data.sqlite.core\\9.0.4\\microsoft.data.sqlite.core.9.0.4.nupkg.sha512",

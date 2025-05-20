@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace CSVGeneratorSOLID
+namespace CSVGenerador
 {
     /// <summary>
     /// Genera valores string usando una lista importada desde un CSV.
@@ -19,7 +19,7 @@ namespace CSVGeneratorSOLID
 
         public ImportedStringGenerator(ColumnDefinition def)
         {
-            _allowRep = def.AllowRepetition;
+            _allowRep = def.PermitirRepeticion;
 
             // 1) Leemos el CSV (una columna, sin cabecera)
             var originales = File.ReadAllLines(def.ImportFilePath!)
@@ -31,9 +31,9 @@ namespace CSVGeneratorSOLID
             _pool = new List<string>(originales);
 
             // 2) ¿Crear extras?
-            if (def.GenerateExtraUnique && def.TotalUniqueDesired.HasValue)
+            if (def.GenerarValoresAdicionalesUnicos && def.TotalValoresUnicosDeseados.HasValue)
             {
-                int objetivo = def.TotalUniqueDesired.Value;
+                int objetivo = def.TotalValoresUnicosDeseados.Value;
                 var hash = new HashSet<string>(_pool);
 
                 while (_pool.Count < objetivo)

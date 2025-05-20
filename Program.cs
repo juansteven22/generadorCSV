@@ -1,44 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CSVGeneratorSOLID
+namespace CSVGenerador
 {
     class Program
     {
         static void Main()
         {
-            Console.WriteLine("=== Generador Múltiple de CSV (SOLID) ===");
+            Console.WriteLine("=== Generador de CSV + SQLite ===");
 
-            var registro       = new RegistroTablas();
-            var tableDefSvc    = new TableDefinitionService();
-            var dataGenSvc     = new DataGenerationService();
-            var writer         = new CSVWriter();
+            var registro   = new RegistroTablas();
+            var defService = new TableDefinitionService();
+            var genService = new DataGenerationService();
+            var csvWriter  = new CSVWriter();
+
+            // --- NUEVO: servicio de base de datos ---
+            using var db = new DatabaseService("data.db");
 
             Console.Write("¿Cuántas tablas quieres crear? ");
-            int totalTablas = int.Parse(Console.ReadLine() ?? "0");
+            int total = int.Parse(Console.ReadLine() ?? "0");
 
-            for (int t = 0; t < totalTablas; t++)
+            for (int t = 0; t < total; t++)
             {
-                Console.WriteLine($"\n================ TABLA {t + 1} de {totalTablas} ================");
-                var (nombre, columnas, filas) = tableDefSvc.GetTableDefinition(registro.GetAll());
+                Console.WriteLine($"\n========= TABLA {t + 1} / {total} =========");
+                var (name, cols, filas) = defService.GetTableDefinition(registro.GetAll());
 
-                // Generamos datos
-                var rows = dataGenSvc.GenerateData(columnas, filas, registro);
+                // 1) Generar datos
+                var rows = genService.GenerateData(cols, filas, registro);
 
-                // Nombre completo de archivo
-                string filePath = $"{nombre}.csv";
-                writer.WriteToCSV(filePath, columnas, rows);
+                // 2) CSV
+                string path = $"{name}.csv";
+                csvWriter.WriteToCSV(path, cols, rows);
 
-                // Registramos para uso futuro
+                // 3) SQLite
+                db.SaveTable(name, cols, rows);
+
+                // 4) Registrar para tablas siguientes
                 registro.Add(new TableMetadata
                 {
-                    TableName = nombre,
-                    Columns   = columnas,
+                    TableName = name,
+                    Columns   = cols,
                     Rows      = rows
                 });
             }
 
-            Console.WriteLine("\nProceso finalizado. Pulsa ENTER para cerrar.");
+            Console.WriteLine("\nProceso completo.  Pulsa ENTER para salir.");
             Console.ReadLine();
         }
     }

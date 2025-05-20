@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CSVGeneratorSOLID
+namespace CSVGenerador
 {
     public class DataGenerationService
     {
@@ -20,7 +20,7 @@ namespace CSVGeneratorSOLID
                 if (d.BaseTableName == null) return null;
                 var t = registro.Find(d.BaseTableName);
                 if (t == null) return null;
-                int idx = t.Columns.FindIndex(c => c.Name == d.BaseColumnName);
+                int idx = t.Columns.FindIndex(c => c.Nombre == d.BaseColumnName);
                 return idx >= 0 ? t.Rows.Select(r => r[idx]).ToList() : null;
             }).ToList();
 
@@ -31,9 +31,9 @@ namespace CSVGeneratorSOLID
             {
                 int available = int.MaxValue;
 
-                if (defs[c].AllowRepetition == false && defs[c].BaseTableName == null)
+                if (defs[c].PermitirRepeticion == false && defs[c].BaseTableName == null)
                 {
-                    switch (defs[c].DataType)
+                    switch (defs[c].TipoDeDato)
                     {
                         case "int":
                             available = ((IntegerDataGenerator)gens[c]).RangeSize();
@@ -49,7 +49,7 @@ namespace CSVGeneratorSOLID
                     maxRows = Math.Min(maxRows, available);
                 }
 
-                if (defs[c].BaseTableName != null && defs[c].AllowRepetition == false)
+                if (defs[c].BaseTableName != null && defs[c].PermitirRepeticion == false)
                     maxRows = Math.Min(maxRows, bases[c]!.Count);
             }
 
@@ -79,10 +79,10 @@ namespace CSVGeneratorSOLID
                     int tries = 0;
                     do
                     {
-                        val = gens[c].GenerateValue(defs[c].AllowRepetition, i);
+                        val = gens[c].GenerateValue(defs[c].PermitirRepeticion, i);
                         tries++;
                     }
-                    while (!defs[c].AllowRepetition && used[c].Contains(val) && tries < 20);
+                    while (!defs[c].PermitirRepeticion && used[c].Contains(val) && tries < 20);
 
                     used[c].Add(val);
                     row[c] = val;
@@ -95,16 +95,16 @@ namespace CSVGeneratorSOLID
         }
 
         // ---------- helper ----------
-        private IDataGenerator CreateGenerator(ColumnDefinition d) => d.DataType switch
+        private IDataGenerator CreateGenerator(ColumnDefinition d) => d.TipoDeDato switch
         {
             "int"      => new IntegerDataGenerator(d.IntMin,  d.IntMax),
             "decimal"  => new DecimalDataGenerator(d.DecMin,  d.DecMax),
             "datetime" => new DateTimeDataGenerator(d.DateMin,d.DateMax),
-            "bool"     => new BoolDataGenerator(),
-            "string"   => d.UseImportedList
+            "bool"     => new BoolDataGenerador(),
+            "string"   => d.UsarListaImportada
                               ? new ImportedStringGenerator(d)
-                              : new StringDataGenerator(d.Name),
-            _          => new StringDataGenerator(d.Name)
+                              : new StringDataGenerator(d.Nombre),
+            _          => new StringDataGenerator(d.Nombre)
         };
     }
 }

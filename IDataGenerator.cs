@@ -1,4 +1,4 @@
-namespace CSVGeneratorSOLID
+namespace CSVGenerador
 {
     public interface IDataGenerator
     {
