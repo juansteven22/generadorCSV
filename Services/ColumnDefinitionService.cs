@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
+
 using System.Globalization;
-using System.Linq;
+using Models;
+
 //Код спрашивает пользователя о колонках таблицы.
-namespace CSVGenerador
+namespace Services
 {
     public class ColumnDefinitionService
     {

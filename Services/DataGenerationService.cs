@@ -1,8 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace CSVGenerador
+
+using Models;
+using Utils;
+
+namespace Services
 {
     public class DataGenerationService
     {

@@ -1,6 +1,6 @@
 
 //Класс описывает одну колонку таблицы.
-namespace CSVGenerador
+namespace Models
 {
     public class ColumnDefinition
     {

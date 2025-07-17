@@ -2,7 +2,7 @@ using System;
 
 //Код генерирует значения "true" или "false".
 
-namespace CSVGenerador
+namespace Utils
 {
     public class BoolDataGenerador : IDataGenerator
     {

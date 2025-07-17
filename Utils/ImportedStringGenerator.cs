@@ -1,16 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
-namespace CSVGenerador
+using Models;
+
+namespace Utils
 {
-    /// <summary>
+    
     /// Genera valores string usando una lista importada desde un CSV.
     /// - Si AllowRepetition = false → devuelve la lista en orden, sin repetir.
     /// - Si AllowRepetition = true  → elige valores al azar (puede repetir).
     /// Puede, opcionalmente, crear más valores únicos añadiendo sufijos.
-    /// </summary>
+    //
     public class ImportedStringGenerator : IDataGenerator
     {
         private readonly List<string> _pool;

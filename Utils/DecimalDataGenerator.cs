@@ -1,7 +1,7 @@
-using System;
+
 using System.Globalization;
 
-namespace CSVGenerador
+namespace Utils
 {
     public class DecimalDataGenerator : IDataGenerator
     {

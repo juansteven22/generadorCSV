@@ -1,9 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 
-namespace CSVGenerador
+using System.Text;
+using Models;
+
+namespace Services
 {
     public class CSVWriter
     {
@@ -26,7 +25,7 @@ namespace CSVGenerador
             {
                 for (int i = 0; i < row.Length; i++)
                 {
-                    // Escapar comas, dobles comillas, etc. si fuera necesario
+                    // Ignorar comas, dobles comillas, etc. si fuera necesario
                     string value = row[i].Replace("\"", "\"\"");
                     if (value.Contains(","))
                     {

@@ -338,11 +338,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Universidad\\Desktop\\Trabajo\\Proyecto 2 IMPORTANTE\\CSVGeneratorSOLID\\CSVGenerador.csproj",
+      "projectUniqueName": "C:\\Users\\Universidad\\Desktop\\Trabajo\\Proyecto 2 - Generador de csv\\CSVGenerator\\CSVGenerador.csproj",
       "projectName": "CSVGenerador",
-      "projectPath": "C:\\Users\\Universidad\\Desktop\\Trabajo\\Proyecto 2 IMPORTANTE\\CSVGeneratorSOLID\\CSVGenerador.csproj",
+      "projectPath": "C:\\Users\\Universidad\\Desktop\\Trabajo\\Proyecto 2 - Generador de csv\\CSVGenerator\\CSVGenerador.csproj",
       "packagesPath": "C:\\Users\\Universidad\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Universidad\\Desktop\\Trabajo\\Proyecto 2 IMPORTANTE\\CSVGeneratorSOLID\\obj\\",
+      "outputPath": "C:\\Users\\Universidad\\Desktop\\Trabajo\\Proyecto 2 - Generador de csv\\CSVGenerator\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

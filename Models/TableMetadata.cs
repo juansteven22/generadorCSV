@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace CSVGenerador
+namespace Models
 {
     public class TableMetadata
     {

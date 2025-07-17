@@ -1,8 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace CSVGenerador
+using Models;
+
+namespace Services
 {
     public class TableDefinitionService
     {

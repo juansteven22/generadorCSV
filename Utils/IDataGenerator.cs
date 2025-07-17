@@ -1,4 +1,4 @@
-namespace CSVGenerador
+namespace Utils
 {
     public interface IDataGenerator
     {
